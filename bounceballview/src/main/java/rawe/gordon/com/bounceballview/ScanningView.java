@@ -6,11 +6,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.util.ArrayList;
 
 
 /**
@@ -22,17 +27,22 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
     private boolean exitFlag = true;
     private Canvas canvas;
     private float angle = 0;
-    private int containerWidth = 600;
+    private int containerWidth = 600;//随便设了一个值
     private Path path;
-    private int center_x,center_y;
+    private int center_x, center_y;
+    private float sqrt3 = 1.7320508f;
+    private int borderWidth;
+
+    //coordinates
+    private ArrayList<PointF> triangle1 = new ArrayList<>();
+    private ArrayList<PointF> triangle2 = new ArrayList<>();
+    private ArrayList<PointF> triangle3 = new ArrayList<>();
+    private ArrayList<PointF> triangle4 = new ArrayList<>();
 
     {
         path = new Path();
         paint = new Paint();
-        paint.setColor(Color.parseColor("#668800ff"));
-        paint.setStyle(Paint.Style.STROKE);
         paint.setAntiAlias(true);
-        paint.setStrokeWidth(5);
     }
 
     public ScanningView(Context context, AttributeSet attrs) {
@@ -46,9 +56,18 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         this.containerWidth = getWidth() < getHeight() ? getWidth() : getHeight();
-        center_x = getWidth()/2;
-        center_y = getHeight()/2;
+        center_x = getWidth() / 2;
+        center_y = getHeight() / 2;
+        borderWidth = containerWidth / 20;
+        calcCoordinates();
         new Thread(this).start();
+    }
+
+    private void calcCoordinates() {
+        //calc triangles' coordinates
+        triangle1.add(new PointF(containerWidth / 2.0f - borderWidth * sqrt3 / 3, 0));
+        triangle1.add(new PointF(containerWidth / 2.0f + borderWidth * sqrt3 / 3, 0));
+        triangle1.add(new PointF(containerWidth / 2.0f, borderWidth));
     }
 
     @Override
@@ -67,16 +86,45 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
     }
 
     private void tickWork() {
-        //static area
-
         try {
+
             canvas = surfaceHolder.lockCanvas();
-            canvas.save();
-//            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-//            canvas.drawRect(new RectF(0,0,getWidth(),getHeight()),paint);
-            angle++;
-            canvas.drawArc(new RectF(0,0,getWidth(),getHeight()),angle,120,true,paint);
-            canvas.restore();
+            //draw four borders first
+            paint.setStrokeWidth(borderWidth);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setColor(Color.parseColor("#cc0099ff"));
+            //four corners
+            path.moveTo(containerWidth / 3, borderWidth / 2);
+            path.lineTo(borderWidth / 2, borderWidth / 2);
+            path.lineTo(borderWidth / 2, containerWidth / 3);
+            canvas.drawPath(path, paint);
+            path.reset();
+            path.moveTo(containerWidth * 2 / 3, borderWidth / 2);
+            path.lineTo(containerWidth - borderWidth / 2, borderWidth / 2);
+            path.lineTo(containerWidth - borderWidth / 2, containerWidth / 3);
+            canvas.drawPath(path, paint);
+            path.reset();
+            path.moveTo(containerWidth / 3, containerWidth - borderWidth / 2);
+            path.lineTo(borderWidth / 2, containerWidth - borderWidth / 2);
+            path.lineTo(borderWidth / 2, containerWidth * 2 / 3);
+            canvas.drawPath(path, paint);
+            path.reset();
+            path.moveTo(containerWidth * 2 / 3, containerWidth - borderWidth / 2);
+            path.lineTo(containerWidth - borderWidth / 2, containerWidth - borderWidth / 2);
+            path.lineTo(containerWidth - borderWidth / 2, containerWidth * 2 / 3);
+            canvas.drawPath(path, paint);
+            //four triangles
+            paint.reset();
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(Color.parseColor("#cc0099ff"));
+            //four triangles
+//            paint.reset();
+            path.moveTo(triangle1.get(0).x, triangle1.get(0).y);
+            path.lineTo(triangle1.get(1).x, triangle1.get(1).y);
+            path.lineTo(triangle1.get(2).x, triangle1.get(2).y);
+            path.close();
+            canvas.drawPath(path,paint);
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -94,6 +142,5 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
                 e.printStackTrace();
             }
         }
-
     }
 }

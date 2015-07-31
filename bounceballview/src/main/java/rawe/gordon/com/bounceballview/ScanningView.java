@@ -6,10 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
@@ -27,11 +25,12 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
     private boolean exitFlag = true;
     private Canvas canvas;
     private float angle = 0;
-    private int containerWidth = 600;//Ëæ±ãÉèÁËÒ»¸öÖµ
+    private int containerWidth = 600;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Öµ
     private Path path;
     private int center_x, center_y;
     private float sqrt3 = 1.7320508f;
     private int borderWidth;
+    private float outterRadius = 0f;
 
     //coordinates
     private ArrayList<PointF> triangle1 = new ArrayList<>();
@@ -58,16 +57,29 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
         this.containerWidth = getWidth() < getHeight() ? getWidth() : getHeight();
         center_x = getWidth() / 2;
         center_y = getHeight() / 2;
-        borderWidth = containerWidth / 20;
+        borderWidth = containerWidth / 40;
+        outterRadius = containerWidth/2-borderWidth-10;
         calcCoordinates();
         new Thread(this).start();
     }
 
     private void calcCoordinates() {
         //calc triangles' coordinates
-        triangle1.add(new PointF(containerWidth / 2.0f - borderWidth * sqrt3 / 3, 0));
-        triangle1.add(new PointF(containerWidth / 2.0f + borderWidth * sqrt3 / 3, 0));
-        triangle1.add(new PointF(containerWidth / 2.0f, borderWidth));
+        triangle1.add(new PointF(((float) (containerWidth / 2.0 - borderWidth * sqrt3 / 3)), 0f));
+        triangle1.add(new PointF(((float) (containerWidth / 2.0 + borderWidth * sqrt3 / 3)), 0));
+        triangle1.add(new PointF(((float) (containerWidth / 2.0)), borderWidth));
+
+        triangle2.add(new PointF(((float) (containerWidth / 2.0 - borderWidth * sqrt3 / 3)), containerWidth));
+        triangle2.add(new PointF(((float) (containerWidth / 2.0 + borderWidth * sqrt3 / 3)), containerWidth));
+        triangle2.add(new PointF(((float) (containerWidth / 2.0)), containerWidth - borderWidth));
+
+        triangle3.add(new PointF(0, ((float) (containerWidth / 2.0 - borderWidth * sqrt3 / 3))));
+        triangle3.add(new PointF(0, ((float) (containerWidth / 2.0 + borderWidth * sqrt3 / 3))));
+        triangle3.add(new PointF(borderWidth, ((float) (containerWidth / 2.0))));
+
+        triangle4.add(new PointF(containerWidth, ((float) (containerWidth / 2.0 - borderWidth * sqrt3 / 3))));
+        triangle4.add(new PointF(containerWidth, ((float) (containerWidth / 2.0 + borderWidth * sqrt3 / 3))));
+        triangle4.add(new PointF(containerWidth - borderWidth, ((float) (containerWidth / 2.0))));
     }
 
     @Override
@@ -89,6 +101,9 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
         try {
 
             canvas = surfaceHolder.lockCanvas();
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+
             //draw four borders first
             paint.setStrokeWidth(borderWidth);
             paint.setStyle(Paint.Style.STROKE);
@@ -118,13 +133,43 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.parseColor("#cc0099ff"));
             //four triangles
-//            paint.reset();
+            path.reset();
             path.moveTo(triangle1.get(0).x, triangle1.get(0).y);
             path.lineTo(triangle1.get(1).x, triangle1.get(1).y);
             path.lineTo(triangle1.get(2).x, triangle1.get(2).y);
             path.close();
-            canvas.drawPath(path,paint);
+            canvas.drawPath(path, paint);
 
+//            path.reset();
+            path.moveTo(triangle2.get(0).x, triangle2.get(0).y);
+            path.lineTo(triangle2.get(1).x, triangle2.get(1).y);
+            path.lineTo(triangle2.get(2).x, triangle2.get(2).y);
+            path.close();
+            canvas.drawPath(path, paint);
+
+//            path.reset();
+            path.moveTo(triangle3.get(0).x, triangle3.get(0).y);
+            path.lineTo(triangle3.get(1).x, triangle3.get(1).y);
+            path.lineTo(triangle3.get(2).x, triangle3.get(2).y);
+            path.close();
+            canvas.drawPath(path, paint);
+
+//            path.reset();
+            path.moveTo(triangle4.get(0).x, triangle4.get(0).y);
+            path.lineTo(triangle4.get(1).x, triangle4.get(1).y);
+            path.lineTo(triangle4.get(2).x, triangle4.get(2).y);
+            path.close();
+            canvas.drawPath(path, paint);
+
+            //draw outer ring
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(borderWidth*0.7f);
+            RectF outterRing = new RectF(center_x-outterRadius,center_y-outterRadius,center_x+outterRadius,center_y+outterRadius);
+            canvas.drawArc(outterRing,10+angle,70,false,paint);
+            canvas.drawArc(outterRing,100+angle,70,false,paint);
+            canvas.drawArc(outterRing,190+angle,70,false,paint);
+            canvas.drawArc(outterRing,280+angle,70,false,paint);
+            angle++;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

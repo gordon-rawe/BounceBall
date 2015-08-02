@@ -3,10 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <rawe.gordon.com.bounceballview.ScanningView
-        android:layout_centerInParent="true"
-        android:layout_width="100dp"
-        android:layout_height="100dp" />
+<<<<<<< HEAD
     <View
         android:id="@+id/info"
         android:layout_width="match_parent"
@@ -14,8 +11,13 @@
         android:layout_alignParentBottom="true"
         android:background="#99dd44ff"
         android:visibility="gone" />
+=======
+    <rawe.gordon.com.bounceballview.ScanningView
+        android:layout_centerInParent="true"
+        android:layout_width="200dp"
+        android:layout_height="200dp" />
+>>>>>>> 41996863bfd71d512a19807e21cb5dce34f2eb4c
 
-</RelativeLayout>
     <rawe.gordon.com.boucingballdemo.BottomDetectScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"

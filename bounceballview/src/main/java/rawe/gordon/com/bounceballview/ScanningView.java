@@ -28,6 +28,7 @@ public class ScanningView extends SurfaceView implements SurfaceHolder.Callback,
     private Canvas canvas;
     private float angle = 0;
     private int containerWidth = 600;//随便设了一个值
+    private int containerWidth = 600;
     private Path path;
     private int center_x, center_y;
     private float sqrt3 = 1.7320508f;

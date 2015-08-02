@@ -3,10 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <rawe.gordon.com.bounceballview.ScanningView
-        android:layout_centerInParent="true"
-        android:layout_width="100dp"
-        android:layout_height="100dp" />
     <View
         android:id="@+id/info"
         android:layout_width="match_parent"
@@ -15,7 +11,6 @@
         android:background="#99dd44ff"
         android:visibility="gone" />
 
-</RelativeLayout>
     <rawe.gordon.com.boucingballdemo.BottomDetectScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
